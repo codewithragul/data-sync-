@@ -169,6 +169,7 @@ app.post("/api/wishlist/sync", async (req, res) => {
 });
 
 
+
 // =============================
 // GET WISHLIST
 // =============================
@@ -201,6 +202,7 @@ app.get("/api/wishlist/:customerId", async (req, res) => {
     res.json([]);
   }
 });
+
 
 
 const PORT = process.env.PORT || 5000;
