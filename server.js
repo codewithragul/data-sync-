@@ -287,6 +287,19 @@ setInterval(() => {
     .catch(() => console.log("Self-ping failed"));
 }, 10 * 60 * 1000);
 
+
+app.get("/token-status", async (req, res) => {
+  const token = await getToken();
+  res.json({
+    token_preview: token.substring(0, 20) + "...",
+    expires_at: new Date(tokenCache.expiresAt).toISOString(),
+    expires_in_hours: ((tokenCache.expiresAt - Date.now()) / 3600000).toFixed(1),
+    is_cached: true
+  });
+});
+
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
