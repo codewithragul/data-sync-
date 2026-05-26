@@ -12,75 +12,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// TEMPORARY ROUTE - Get permanent token (remove after getting token)
-app.get('/auth/callback', async (req, res) => {
-  try {
-    const { code, shop } = req.query;
-    
-    if (!code || !shop) {
-      return res.status(400).send('Missing code or shop parameter');
-    }
-    
-    console.log('📥 Received callback with code:', code.substring(0, 20) + '...');
-    console.log('🏪 Shop:', shop);
-    
-    // Exchange the code for a permanent token
-    const response = await axios.post(`https://${shop}/admin/oauth/access_token`, {
-      client_id: process.env.SHOPIFY_CLIENT_ID,
-      client_secret: process.env.SHOPIFY_CLIENT_SECRET,
-      code: code
-    });
-    
-    // THIS IS YOUR PERMANENT TOKEN (no expires_in field!)
-    const PERMANENT_TOKEN = response.data.access_token;
-    
-    console.log('\n✅✅✅ PERMANENT TOKEN GENERATED ✅✅✅');
-    console.log('TOKEN:', PERMANENT_TOKEN);
-    console.log('This token will NEVER expire!\n');
-    
-    // Display the token on webpage
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Permanent Token Generated</title>
-        <style>
-          body { font-family: monospace; padding: 20px; background: #f5f5f5; }
-          .token-box { background: white; border: 2px solid green; padding: 20px; border-radius: 10px; margin: 20px 0; }
-          .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; }
-          button { background: green; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        </style>
-      </head>
-      <body>
-        <h1 style="color: green;">✅ Permanent Token Generated Successfully!</h1>
-        <div class="token-box">
-          <h3>Your Permanent API Token (Never Expires):</h3>
-          <code style="font-size: 16px; word-break: break-all;">${PERMANENT_TOKEN}</code>
-        </div>
-        <div class="warning">
-          <strong>⚠️ IMPORTANT:</strong>
-          <ul>
-            <li>Copy this token RIGHT NOW - you won't see it again!</li>
-            <li>This token will NEVER expire</li>
-            <li>Add it to Render environment variable: <code>SHOPIFY_ADMIN_TOKEN</code></li>
-            <li>Restart your Render service after adding</li>
-          </ul>
-        </div>
-        <button onclick="navigator.clipboard.writeText('${PERMANENT_TOKEN}')">📋 Copy Token to Clipboard</button>
-        <p style="margin-top: 20px;">After saving the token, remove the <code>/auth/callback</code> route from your code and redeploy.</p>
-      </body>
-      </html>
-    `);
-    
-  } catch (error) {
-    console.error('❌ Error getting token:', error.response?.data || error.message);
-    res.status(500).send(`
-      <h1>Error Getting Token</h1>
-      <p>Error: ${error.response?.data?.error || error.message}</p>
-      <p>Check your Client ID and Client Secret are correct in environment variables.</p>
-    `);
-  }
-});
+
 
 const SHOP = process.env.SHOPIFY_STORE;
 const TOKEN = process.env.SHOPIFY_ADMIN_TOKEN;
